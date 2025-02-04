@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-application
+spec:
+  replicas: 3 # Adjust the number of replicas as needed
+  selector:
+    matchLabels:
+      app: flask-application
+  template:
+    metadata:
+      labels:
+        app: flask-application
+    spec:
+      containers:
+      - name: flask-app
+        image: gregogs/testings:flask-V1
+        ports:
+        - containerPort: 5000 # Replace with your Flask app's port
