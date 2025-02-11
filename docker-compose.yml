@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  flask_app:
+    image: gregogs/testings:flask-V1
+    container_name: flask_container
+    ports:
+      - "5000:5000"
+    networks:
+      - app_network
+  website:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./flask-application/templates:/usr/share/nginx/html
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://flask_app:5000/healthz && curl -f http://localhost:80" ]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
