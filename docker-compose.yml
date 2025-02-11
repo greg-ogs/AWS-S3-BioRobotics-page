@@ -22,7 +22,6 @@ services:
       start_period: 30s
     networks:
       - app_network
-
 networks:
   app_network:
     driver: bridge
