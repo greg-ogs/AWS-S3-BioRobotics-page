@@ -1,6 +1,17 @@
 version: '3.8'
 
 services:
+  opentofu:
+    image: ghcr.io/opentofu/opentofu:1.9.0
+    container_name: opentofu
+    volumes:
+      - ./flask-application:/flask-application
+      - ./infra:/infra
+    environment:
+      - AWS_SECRET_ACCES_KEY
+      - AWS_ACCES_KEY_ID
+      - AWS_SESSION_TOKEN
+      - AWS_REGION=us-west-1
   flask_app:
     image: gregogs/testings:flask-V1
     container_name: flask_container
