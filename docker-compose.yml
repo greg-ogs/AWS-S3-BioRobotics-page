@@ -26,7 +26,7 @@ services:
     networks:
       - app_network
   selenium:
-    image: selenium/standalone-chromium
+    image: selenium/standalone-chromium:latest
     ports:
       - 4444:4444
       - 5900:5900
