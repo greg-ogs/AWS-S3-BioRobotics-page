@@ -6,7 +6,7 @@ terraform {
     }
   }
 }
-
+# Is for an static page, do not for a flask application, kubernetes is prefered
 locals {
   mime_types = {
     "html" : "text/html"
@@ -26,6 +26,11 @@ locals {
     "woff" : "font/woff"
   }
 }
+
+provider "aws" {
+  region = "us-west-1"
+}
+
 variable "website_domain_name" {
   description = "The domain name of the website"
   default = "mytestsite.io"
@@ -61,11 +66,11 @@ resource "aws_s3_object" "flask-application" {
   aws_s3_bucket_public_access_block.flask-application,
   aws_s3_bucket_ownership_controls.flask-application
   ]
-  for_each = fileset("./flask-application", "**/*.*")
+  for_each = fileset("./flask-application/templates", "**/*.*")
   bucket = aws_s3_bucket.flask-application.id
   key = each.value
-  source = "./flask-application/${each.key}"
-  etag = filemd5("./flask-application/${each.key}")
+  source = "./flask-application/templates/${each.key}"
+  etag = filemd5("./flask-application/templates/${each.key}")
   acl = "public-read"
   content_type = lookup(local.mime_types, split(".", each.value)[(length(split(".", each.value)) - 1)], "text/plain")
 }
@@ -76,7 +81,7 @@ resource "aws_s3_bucket_website_configuration" "flask-application" {
     suffix = "index.html"
   }
   error_document {
-    key = "error.html"
+    key = "docker-page.html"
   }
 }
 
