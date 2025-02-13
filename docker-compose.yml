@@ -7,11 +7,14 @@ services:
     volumes:
       - ./flask-application:/flask-application
       - ./infra:/infra
+    working_dir: /infra
     environment:
       - AWS_SECRET_ACCES_KEY
       - AWS_ACCES_KEY_ID
       - AWS_SESSION_TOKEN
       - AWS_REGION=us-west-1
+    networks:
+      - app_network
   flask_app:
     image: gregogs/testings:flask-V1
     container_name: flask_container
@@ -55,12 +58,26 @@ services:
         condition: service_healthy
       selenium:
         condition: service_healthy
-    build:
-      context: .
     image: gregogs/testings:ruby-V1
+    volumes:
+      - ./tests:/tests
     command:
       - --pattern
       - /tests/utest/*_spec.rb
+    networks:
+      - app_network
+  integration_test:
+    depends_on:
+      selenium:
+        condition: service_healthy
+    image: gregogs/testings:ruby-V1
+    volumes:
+      - ./tests:/tests
+    environment:
+      - WEBSITE_URL
+    command:
+      - --pattern
+      - /tests/itest/*_spec.rb
     networks:
       - app_network
 networks:
