@@ -14,21 +14,8 @@ services:
       - AWS_SESSION_TOKEN
       - AWS_REGION
     networks:
-      - app_network
-  flask_app:
-    image: gregogs/testings:flask-V1.1
-    container_name: flask_container
-    ports:
-      - "5000:5000"
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -q -O /dev/null http://flask_app:5000/healthz" ]
-      interval: 10s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    networks:
-      - app_network
-  website:
+      - robotics-net
+  Robotics-web:
     image: busybox:latest
     command: ["sleep", "infinity"]
     healthcheck:
@@ -38,14 +25,14 @@ services:
       retries: 3
       start_period: 30s
     networks:
-      - app_network
+      - robotics-net
   selenium:
     image: selenium/standalone-chromium:latest
     ports:
       - 4444:4444
       - 5900:5900
     networks:
-      - app_network
+      - robotics-net
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://flask_app:5000/healthz && curl -f http://localhost:4444" ]
       interval: 10s
@@ -54,7 +41,7 @@ services:
       start_period: 30s
   unit_test:
     depends_on:
-      website:
+      Robotics-web:
         condition: service_healthy
       selenium:
         condition: service_healthy
@@ -65,7 +52,7 @@ services:
       - --pattern
       - /tests/utest/*_spec.rb
     networks:
-      - app_network
+      - robotics-net
   integration_test:
     depends_on:
       selenium:
@@ -79,7 +66,7 @@ services:
       - --pattern
       - /tests/itest/*_spec.rb
     networks:
-      - app_network
+      - robotics-net
 networks:
-  app_network:
+  robotics-net:
     driver: bridge
