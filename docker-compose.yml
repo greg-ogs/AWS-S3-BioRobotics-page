@@ -16,7 +16,7 @@ services:
     networks:
       - app_network
   flask_app:
-    image: gregogs/testings:flask-V1
+    image: gregogs/testings:flask-V1.1
     container_name: flask_container
     ports:
       - "5000:5000"
