@@ -29,12 +29,4 @@ describe '"Integration" test for aws s3' do
     expect(page).to have_content('Robotics')
     expect(page).to have_selector('h1', text: 'BioRobotics Research')
   end
-  it 'Should be able to load the docker page' do
-    visit(ENV['WEBSITE_URL'])
-    expect(page).to have_current_path(ENV['WEBSITE_URL'])
-  end
-  it 'Should be able to load the flask page' do
-    visit(ENV['WEBSITE_URL'])
-    expect(page).to have_current_path(ENV['WEBSITE_URL'])
-  end
 end

@@ -42,49 +42,52 @@ resource "random_string" "bucket_name_prefix" {
   upper   = false
 }
 
-resource "aws_s3_bucket" "flask-application" {
+resource "aws_s3_bucket" "robotics-page" {
   bucket = "${random_string.bucket_name_prefix.result}-${var.website_domain_name}"
 }
 
-resource "aws_s3_bucket_ownership_controls" "flask-application" {
-  bucket = aws_s3_bucket.flask-application.id
+resource "aws_s3_bucket_ownership_controls" "robotics-page" {
+  bucket = aws_s3_bucket.robotics-page.id
   rule {
     object_ownership = "ObjectWriter"
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "flask-application" {
-  bucket = aws_s3_bucket.flask-application.id
+resource "aws_s3_bucket_public_access_block" "robotics-page" {
+  bucket = aws_s3_bucket.robotics-page.id
   block_public_acls       = false
   block_public_policy     = false
   ignore_public_acls      = false
   restrict_public_buckets = false
 }
-
-resource "aws_s3_object" "flask-application" {
+resource "aws_s3_object" "robotics-page" {
   depends_on = [
-  aws_s3_bucket_public_access_block.flask-application,
-  aws_s3_bucket_ownership_controls.flask-application
+    aws_s3_bucket_public_access_block.robotics-page,
+    aws_s3_bucket_ownership_controls.robotics-page
   ]
-  for_each = fileset("./flask-application/templates", "**/*.*")
-  bucket = aws_s3_bucket.flask-application.id
-  key = each.value
-  source = "./flask-application/templates/${each.key}"
-  etag = filemd5("./flask-application/templates/${each.key}")
-  acl = "public-read"
-  content_type = lookup(local.mime_types, split(".", each.value)[(length(split(".", each.value)) - 1)], "text/plain")
+  for_each     = fileset("/Robotics-web", "**/*")
+  bucket       = aws_s3_bucket.robotics-page.id
+  key          = each.value
+  source       = "/Robotics-web/${each.value}"
+  etag         = filemd5("/Robotics-web/${each.value}")
+  acl          = "public-read"
+  content_type = lookup(local.mime_types, split(".", each.value)[length(split(".", each.value)) - 1], "text/plain")
 }
 
-resource "aws_s3_bucket_website_configuration" "flask-application" {
-  bucket = aws_s3_bucket.flask-application.id
+resource "aws_s3_bucket_website_configuration" "robotics-page" {
+  depends_on = [
+    aws_s3_bucket.robotics-page,
+    aws_s3_object.robotics-page
+  ]
+  bucket = aws_s3_bucket.robotics-page.id
   index_document {
     suffix = "index.html"
   }
   error_document {
-    key = "docker-page.html"
+    key = "Methods-page.html"
   }
 }
 
 output "website_url" {
-  value = aws_s3_bucket_website_configuration.flask-application.website_endpoint
+  value = aws_s3_bucket_website_configuration.robotics-page.website_endpoint
 }

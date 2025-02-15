@@ -5,7 +5,7 @@ services:
     image: ghcr.io/opentofu/opentofu:1.9.0
     container_name: opentofu
     volumes:
-      - ./flask-application:/flask-application
+      - ./Robotics-web:/Robotics-web
       - ./infra:/infra
     working_dir: /infra
     environment:
