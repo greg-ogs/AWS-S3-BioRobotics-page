@@ -1,57 +1,75 @@
 version: '3.8'
 
 services:
-  flask_app:
-    image: gregogs/testings:flask-V1
-    container_name: flask_container
+  opentofu:
+    image: ghcr.io/opentofu/opentofu:1.9.0
+    container_name: opentofu
+    volumes:
+      - ./flask-application:/flask-application
+      - ./infra:/infra
+    working_dir: /infra
+    environment:
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_ACCESS_KEY_ID
+      - AWS_SESSION_TOKEN
+      - AWS_REGION
+    networks:
+      - robotics-net
+  Robotics-web:
+    image: nginx:latest
+    volumes:
+      - ./Robotics-web:/usr/share/nginx/html
     ports:
-      - "5000:5000"
+      - 8080:80
     healthcheck:
-      test: [ "CMD-SHELL", "wget -q -O /dev/null http://flask_app:5000/healthz" ]
+      test: ["CMD-SHELL", "curl -f  http://localhost:80"]
       interval: 10s
       timeout: 10s
       retries: 3
       start_period: 30s
     networks:
-      - app_network
-  website:
-    image: busybox:latest
-    command: ["sleep", "infinity"]
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://flask_app:5000/healthz"]
-      interval: 10s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    networks:
-      - app_network
+      - robotics-net
   selenium:
     image: selenium/standalone-chromium:latest
     ports:
       - 4444:4444
       - 5900:5900
     networks:
-      - app_network
+      - robotics-net
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://flask_app:5000/healthz && curl -f http://localhost:4444" ]
+      test: [ "CMD-SHELL", "curl -f http://Robotics-web:80 && curl -f http://localhost:4444" ]
       interval: 10s
       timeout: 10s
       retries: 3
       start_period: 30s
   unit_test:
     depends_on:
-      website:
+      Robotics-web:
         condition: service_healthy
       selenium:
         condition: service_healthy
-    build:
-      context: .
     image: gregogs/testings:ruby-V1
+    volumes:
+      - ./tests:/tests
     command:
       - --pattern
       - /tests/utest/*_spec.rb
     networks:
-      - app_network
+      - robotics-net
+  integration_test:
+    depends_on:
+      selenium:
+        condition: service_healthy
+    image: gregogs/testings:ruby-V1
+    volumes:
+      - ./tests:/tests
+    environment:
+      - WEBSITE_URL
+    command:
+      - --pattern
+      - /tests/itest/*_spec.rb
+    networks:
+      - robotics-net
 networks:
-  app_network:
+  robotics-net:
     driver: bridge
