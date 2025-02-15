@@ -103,26 +103,26 @@ a {
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23); /* More pronounced shadow on hover */
 }
 
-body.docker {
-    background-color: #1976D2; /* Docker blue */
+body.Methods {
+    background-color: #1976D2; /* Methods blue */
     color: white;
 }
 
-body.docker h1 {
+body.Methods h1 {
     color: white;
 }
-body.docker .definition-box h2{
-    color: #424242; /* Maintain white titles on Docker page */
+body.Methods .definition-box h2{
+    color: #424242; /* Maintain white titles on Methods page */
 }
 
-body.flask {
-    background-color: #0288D1; /* Flask blue */
+body.Robotics {
+    background-color: #0288D1; /* Robotics blue */
     color: white;
 }
 
-body.flask h1 {
+body.Robotics h1 {
     color: white;
 }
-body.flask .definition-box h2 {
+body.Robotics .definition-box h2 {
     color: #424242;
 }

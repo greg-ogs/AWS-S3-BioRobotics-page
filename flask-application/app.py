@@ -7,13 +7,13 @@ app = Flask(__name__)
 def hello_world():  # put application's code here
     return render_template('index.html')
 
-@app.route('/flask')
+@app.route('/robotics')
 def flask_page():
-    return render_template('flask-page.html')
+    return render_template('Robotics-page.html')
 
-@app.route('/docker')
+@app.route('/methods')
 def docker_page():
-    return render_template('docker-page.html')
+    return render_template('Methods-page.html')
 
 @app.route("/healthz")
 def healthz():
