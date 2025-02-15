@@ -1,4 +1,4 @@
-# Roboticas: AWS S3 Bucket Infrastructure Testing Project
+# Robotics: AWS S3 Bucket Infrastructure Testing Project
 
 ## Project Overview
 
