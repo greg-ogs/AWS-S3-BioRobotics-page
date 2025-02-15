@@ -23,17 +23,9 @@ Capybara.default_driver = :selenium
 
 describe 'Unitary test for index page' do
   it 'Should be able to load the index page' do
-    visit('http://flask_app:5000')
-    expect(page).to have_current_path('http://flask_app:5000')
-    expect(page).to have_content('Docker')
-    expect(page).to have_selector('h1', text: 'Docker container flask app test')
-  end
-  it 'Should be able to load the docker page' do
-    visit('http://flask_app:5000/docker')
-    expect(page).to have_current_path('http://flask_app:5000/docker')
-  end
-  it 'Should be able to load the flask page' do
-    visit('http://flask_app:5000/flask')
-    expect(page).to have_current_path('http://flask_app:5000/flask')
+    visit('http://Robotics-web:80')
+    expect(page).to have_current_path('http://Robotics-web:80')
+    expect(page).to have_content('Robotics')
+    expect(page).to have_selector('h1', text: 'BioRobotics Research')
   end
 end
