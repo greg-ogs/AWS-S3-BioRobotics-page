@@ -6,6 +6,7 @@ terraform {
     }
   }
 }
+
 # Is for an static page, do not for a flask application, kubernetes is prefered
 locals {
   mime_types = {
@@ -46,10 +47,17 @@ resource "aws_s3_bucket" "robotics-page" {
   bucket = "${random_string.bucket_name_prefix.result}-${var.website_domain_name}"
 }
 
+resource "aws_s3_bucket_versioning" "robotics-page" {
+  bucket = aws_s3_bucket.robotics-page.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 resource "aws_s3_bucket_ownership_controls" "robotics-page" {
   bucket = aws_s3_bucket.robotics-page.id
   rule {
-    object_ownership = "ObjectWriter"
+    object_ownership = "BucketOwnerPreferred"
   }
 }
 
@@ -60,6 +68,39 @@ resource "aws_s3_bucket_public_access_block" "robotics-page" {
   ignore_public_acls      = false
   restrict_public_buckets = false
 }
+
+# Bucket Policy to enable public read access
+resource "aws_s3_bucket_policy" "robotics-page" {
+  bucket = aws_s3_bucket.robotics-page.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "PublicReadGetObject"
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "s3:GetObject"
+        Resource = [
+          "${aws_s3_bucket.robotics-page.arn}",
+          "${aws_s3_bucket.robotics-page.arn}/*"
+        ]
+        # Condition = {
+        #   IpAddress = {
+        #     "aws:SourceIp" = [
+        #       "203.0.112.0/24",  # Replace with the specific IP you want to allow
+        #       # You can add multiple IPs like this: "203.0.113.0/24",
+        #       # You can add multiple IPs like this: "203.0.114.0/24"
+        #     ]
+        #   }
+        # }
+      }
+    ]
+  })
+  # Ensure policy is applied after public access block
+  depends_on = [aws_s3_bucket_public_access_block.robotics-page]
+}
+
+
 resource "aws_s3_object" "robotics-page" {
   depends_on = [
     aws_s3_bucket_public_access_block.robotics-page,
