@@ -16,10 +16,13 @@ services:
     networks:
       - robotics-net
   Robotics-web:
-    image: busybox:latest
-    command: ["sleep", "infinity"]
+    image: nginx:latest
+    volumes:
+      - ./Robotics-web:/usr/share/nginx/html
+    ports:
+      - 8080:80
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://flask_app:5000/healthz"]
+      test: ["CMD-SHELL", "curl -f  http://localhost:80"]
       interval: 10s
       timeout: 10s
       retries: 3
@@ -34,7 +37,7 @@ services:
     networks:
       - robotics-net
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://flask_app:5000/healthz && curl -f http://localhost:4444" ]
+      test: [ "CMD-SHELL", "curl -f http://Robotics-web:80 && curl -f http://localhost:4444" ]
       interval: 10s
       timeout: 10s
       retries: 3
